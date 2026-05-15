@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --border: #2a2a2a;
+  --muted: #404040;
+  --dim: #666666;
+  --text: #e8e8e2;
+  --green: #7dc87d;
+  --green-dim: #2d4d2d;
+  --amber: #e8b84b;
+  --red: #e06c6c;
+  --blue: #7ab0d4;
+  --purple: #b39ddb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+/* Focus ring */
+*:focus-visible {
+  outline: 1px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* Input reset */
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--dim);
+}
+
+/* Cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--green);
+  animation: blink 1.2s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* Heatmap */
+.hm-0 { background: var(--surface2); }
+.hm-1 { background: #2d4d2d; }
+.hm-2 { background: #3d6e3d; }
+.hm-3 { background: #5a9e5a; }
+.hm-4 { background: var(--green); }
+
+/* Tag colors */
+.area-work    { color: var(--blue); border-color: #2a3d4d; background: #0d1f2d; }
+.area-health  { color: var(--green); border-color: var(--green-dim); background: #0d1a0d; }
+.area-personal { color: var(--purple); border-color: #2d2540; background: #1a1527; }
+
+/* Priority indicators */
+.pri-high { border-left: 2px solid var(--red); }
+.pri-low  { border-left: 2px solid var(--muted); }
+
+/* Scanline effect for atmosphere */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  z-index: 9999;
+}
