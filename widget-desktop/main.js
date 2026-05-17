@@ -53,6 +53,7 @@ function createWindow() {
     alwaysOnTop: false,
     skipTaskbar: true,
     hasShadow: false,
+    type: 'toolbar',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -72,9 +73,9 @@ function toggleWidget() {
   if (win.isVisible()) {
     win.hide()
   } else {
+    win.loadFile('widget.html')  // Reload fresh on every toggle
     win.show()
     win.focus()
-    // Tell renderer to focus the input
     win.webContents.send('focus-input')
   }
 }
