@@ -50,7 +50,7 @@ export function TaskInput({ onAdd, activeSection, autoFocus }: Props) {
         value={value}
         onChange={e => setValue(e.target.value)}
         onKeyDown={handleKey}
-        placeholder={`add task... #area ~due !high`}
+        placeholder={`add task... #area ~due !high @daily`}
         style={{ flex: 1, fontSize: '13px' }}
         spellCheck={false}
         autoComplete="off"

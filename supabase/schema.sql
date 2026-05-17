@@ -10,17 +10,18 @@ create table if not exists tasks (
   completed boolean default false,
   completed_at timestamptz,
   section text not null default 'today' check (section in ('today', 'this_week', 'someday')),
-  area text,           -- #tag e.g. 'work', 'health', 'personal'
+  area text,
   due_date date,
   priority text default 'normal' check (priority in ('high', 'normal', 'low')),
-  recurring text,      -- v2: 'daily', 'weekly', 'monthly'
-  position integer default 0
+  recurring text check (recurring in ('daily', 'weekly', 'monthly')),
+  position integer default 0,
+  parent_id uuid references tasks(id) on delete cascade
 );
 
--- Index for heatmap queries (completed tasks by date)
 create index if not exists tasks_completed_at_idx on tasks (completed_at);
 create index if not exists tasks_section_idx on tasks (section);
 create index if not exists tasks_area_idx on tasks (area);
+create index if not exists tasks_parent_id_idx on tasks (parent_id);
 
 -- Auto-update updated_at
 create or replace function update_updated_at()
@@ -40,3 +41,7 @@ alter table tasks enable row level security;
 
 create policy "Allow all for now" on tasks
   for all using (true) with check (true);
+
+-- v2 migration — run only if table already existed before v2:
+-- alter table tasks add column if not exists parent_id uuid references tasks(id) on delete cascade;
+-- create index if not exists tasks_parent_id_idx on tasks (parent_id);

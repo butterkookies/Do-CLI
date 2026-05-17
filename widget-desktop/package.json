@@ -1,0 +1,12 @@
+{
+  "name": "do-widget",
+  "version": "1.0.0",
+  "description": "do. stats desktop widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^30.0.0"
+  }
+}

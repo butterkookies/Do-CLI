@@ -14,11 +14,14 @@ interface Props {
   onDelete: (id: string) => void
   onUpdate: (id: string, updates: Partial<Task>) => void
   onMove: (id: string, section: SectionType) => void
+  subTaskMap?: Map<string, Task[]>
+  onAddSubTask?: (parentId: string, title: string) => void
 }
 
 export function SectionBlock({
   section, label, tasks, selectedId,
   onSelect, onComplete, onDelete, onUpdate, onMove,
+  subTaskMap, onAddSubTask,
 }: Props) {
   const [collapsed, setCollapsed] = useState(false)
 
@@ -83,6 +86,8 @@ export function SectionBlock({
                 onUpdate={onUpdate}
                 onMove={onMove}
                 onClick={() => onSelect(task.id)}
+                subTasks={subTaskMap?.get(task.id) ?? []}
+                onAddSubTask={onAddSubTask}
               />
             ))
           )}

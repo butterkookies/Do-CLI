@@ -135,20 +135,20 @@ export function FilterBar({ filter, setFilter, areas }: Props) {
 
         {/* Show completed toggle */}
         <button
-          onClick={() => set({ completed: filter.completed === false ? null : false })}
+          onClick={() => set({ completed: filter.completed === null ? false : null })}
           style={{
             padding: '3px 10px',
             borderRadius: '3px',
             fontSize: '11px',
             cursor: 'pointer',
             border: '0.5px solid',
-            borderColor: filter.completed !== false ? 'var(--amber)' : 'var(--border)',
-            background: filter.completed !== false ? '#2d2200' : 'transparent',
-            color: filter.completed !== false ? 'var(--amber)' : 'var(--dim)',
+            borderColor: filter.completed === null ? 'var(--amber)' : 'var(--border)',
+            background: filter.completed === null ? '#2d2200' : 'transparent',
+            color: filter.completed === null ? 'var(--amber)' : 'var(--dim)',
             transition: 'all 0.1s',
           }}
         >
-          {filter.completed !== false ? 'showing done' : 'hide done'}
+          {filter.completed === null ? 'showing done' : 'hide done'}
         </button>
       </div>
     </div>

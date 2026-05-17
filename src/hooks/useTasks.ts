@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Task, NewTask, FilterState, HeatmapDay, Section } from '@/types'
+import { Task, NewTask, FilterState, HeatmapDay, Section, Priority } from '@/types'
 import { parseTaskInput } from '@/lib/parseTask'
 import { buildHeatmapGrid, computeStreak } from '@/lib/heatmap'
 
@@ -10,8 +10,16 @@ const DEFAULT_FILTER: FilterState = {
   section: 'all',
   area: null,
   priority: null,
-  completed: false,
+  completed: null,
   search: '',
+}
+
+function nextDueDate(recurring: string): string {
+  const d = new Date()
+  if (recurring === 'daily') d.setDate(d.getDate() + 1)
+  else if (recurring === 'weekly') d.setDate(d.getDate() + 7)
+  else if (recurring === 'monthly') d.setMonth(d.getMonth() + 1)
+  return d.toISOString().split('T')[0]
 }
 
 export function useTasks() {
@@ -53,8 +61,7 @@ export function useTasks() {
       countMap.set(date, (countMap.get(date) ?? 0) + 1)
     }
 
-    const result: HeatmapDay[] = Array.from(countMap.entries()).map(([date, count]) => ({ date, count }))
-    setHeatmapData(result)
+    setHeatmapData(Array.from(countMap.entries()).map(([date, count]) => ({ date, count })))
   }, [])
 
   useEffect(() => {
@@ -75,7 +82,8 @@ export function useTasks() {
       area: parsed.area,
       due_date: parsed.due_date,
       priority: parsed.priority,
-      recurring: null,
+      recurring: parsed.recurring,
+      parent_id: null,
     }
 
     const { data, error } = await supabase
@@ -87,6 +95,32 @@ export function useTasks() {
     if (error) { setError(error.message); return }
     setTasks(prev => [...prev, data as Task])
   }, [])
+
+  const addSubTask = useCallback(async (parentId: string, title: string) => {
+    const parent = tasks.find(t => t.id === parentId)
+    if (!parent || !title.trim()) return
+
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert([{
+        title: title.trim(),
+        notes: null,
+        completed: false,
+        completed_at: null,
+        section: parent.section,
+        area: parent.area,
+        due_date: null,
+        priority: 'normal' as Priority,
+        recurring: null,
+        parent_id: parentId,
+        position: 0,
+      }])
+      .select()
+      .single()
+
+    if (error) { setError(error.message); return }
+    setTasks(prev => [...prev, data as Task])
+  }, [tasks])
 
   const completeTask = useCallback(async (id: string) => {
     const task = tasks.find(t => t.id === id)
@@ -103,6 +137,7 @@ export function useTasks() {
     if (error) { setError(error.message); return }
 
     setTasks(prev => prev.map(t => t.id === id ? { ...t, completed, completed_at } : t))
+
     if (completed) {
       const date = new Date().toISOString().split('T')[0]
       setHeatmapData(prev => {
@@ -110,13 +145,36 @@ export function useTasks() {
         if (existing) return prev.map(d => d.date === date ? { ...d, count: d.count + 1 } : d)
         return [...prev, { date, count: 1 }]
       })
+
+      if (task.recurring && !task.parent_id) {
+        const due = nextDueDate(task.recurring)
+        const { data: next } = await supabase
+          .from('tasks')
+          .insert([{
+            title: task.title,
+            notes: task.notes,
+            completed: false,
+            completed_at: null,
+            section: task.section,
+            area: task.area,
+            due_date: due,
+            priority: task.priority,
+            recurring: task.recurring,
+            parent_id: null,
+            position: task.position,
+          }])
+          .select()
+          .single()
+
+        if (next) setTasks(prev => [...prev, next as Task])
+      }
     }
   }, [tasks])
 
   const deleteTask = useCallback(async (id: string) => {
     const { error } = await supabase.from('tasks').delete().eq('id', id)
     if (error) { setError(error.message); return }
-    setTasks(prev => prev.filter(t => t.id !== id))
+    setTasks(prev => prev.filter(t => t.id !== id && t.parent_id !== id))
   }, [])
 
   const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
@@ -139,8 +197,9 @@ export function useTasks() {
     URL.revokeObjectURL(url)
   }, [tasks])
 
-  // Derived
+  // Derived: top-level tasks matching filter (exclude sub-tasks)
   const filteredTasks = tasks.filter(t => {
+    if (t.parent_id) return false
     if (filter.completed !== null && t.completed !== filter.completed) return false
     if (filter.section !== 'all' && t.section !== filter.section) return false
     if (filter.area && t.area !== filter.area) return false
@@ -149,23 +208,46 @@ export function useTasks() {
     return true
   })
 
-  const areas = [...new Set(tasks.map(t => t.area).filter(Boolean))] as string[]
+  // All top-level tasks matching non-section filters (for kanban/table)
+  const allFilteredTasks = tasks.filter(t => {
+    if (t.parent_id) return false
+    if (filter.completed !== null && t.completed !== filter.completed) return false
+    if (filter.area && t.area !== filter.area) return false
+    if (filter.priority && t.priority !== filter.priority) return false
+    if (filter.search && !t.title.toLowerCase().includes(filter.search.toLowerCase())) return false
+    return true
+  })
 
-  const todayCount = tasks.filter(t => t.section === 'today' && !t.completed).length
-  const todayDone = tasks.filter(t => t.section === 'today' && t.completed).length
+  // Sub-tasks grouped by parent_id (not filtered — always show with parent)
+  const subTaskMap = new Map<string, Task[]>()
+  for (const t of tasks) {
+    if (t.parent_id != null) {
+      const arr = subTaskMap.get(t.parent_id) ?? []
+      arr.push(t)
+      subTaskMap.set(t.parent_id, arr)
+    }
+  }
+
+  const areas = Array.from(new Set(tasks.filter(t => !t.parent_id).map(t => t.area).filter(Boolean))) as string[]
+
+  const todayCount = tasks.filter(t => t.section === 'today' && !t.completed && !t.parent_id).length
+  const todayDone = tasks.filter(t => t.section === 'today' && t.completed && !t.parent_id).length
 
   const heatmapGrid = buildHeatmapGrid(heatmapData)
   const streak = computeStreak(heatmapData)
 
   return {
     tasks: filteredTasks,
+    allFilteredTasks,
     allTasks: tasks,
+    subTaskMap,
     loading,
     error,
     filter,
     setFilter,
     areas,
     addTask,
+    addSubTask,
     completeTask,
     deleteTask,
     updateTask,

@@ -1,5 +1,6 @@
 export type Section = 'today' | 'this_week' | 'someday'
 export type Priority = 'high' | 'normal' | 'low'
+export type ViewMode = 'list' | 'kanban' | 'table'
 
 export interface Task {
   id: string
@@ -15,6 +16,7 @@ export interface Task {
   priority: Priority
   recurring: string | null
   position: number
+  parent_id: string | null
 }
 
 export type NewTask = Omit<Task, 'id' | 'created_at' | 'updated_at'>

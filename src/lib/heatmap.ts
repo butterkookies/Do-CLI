@@ -54,7 +54,7 @@ export function computeStreak(data: HeatmapDay[]): { current: number; longest: n
   }
 
   // Walk all for longest
-  const sorted = [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  const sorted = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   let prev: string | null = null
   for (const [date, count] of sorted) {
     if (count === 0) { streak = 0; prev = null; continue }

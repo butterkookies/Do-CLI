@@ -6,6 +6,7 @@ export interface ParsedInput {
   due_date: string | null
   priority: Priority
   section: Section
+  recurring: string | null
 }
 
 const DAY_MAP: Record<string, number> = {
@@ -47,6 +48,7 @@ export function parseTaskInput(input: string): ParsedInput {
   let due_date: string | null = null
   let priority: Priority = 'normal'
   let section: Section = 'today'
+  let recurring: string | null = null
 
   // Extract #tag
   const tagMatch = title.match(/#(\w+)/)
@@ -60,7 +62,6 @@ export function parseTaskInput(input: string): ParsedInput {
   if (dueMatch) {
     due_date = resolveDueDate(dueMatch[1])
     title = title.replace(dueMatch[0], '').trim()
-    // Infer section from due date
     if (due_date) {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -79,10 +80,16 @@ export function parseTaskInput(input: string): ParsedInput {
     title = title.replace(priMatch[0], '').trim()
   }
 
-  // Collapse multiple spaces
+  // Extract @recurring
+  const recurMatch = title.match(/@(daily|weekly|monthly)/)
+  if (recurMatch) {
+    recurring = recurMatch[1]
+    title = title.replace(recurMatch[0], '').trim()
+  }
+
   title = title.replace(/\s+/g, ' ').trim()
 
-  return { title, area, due_date, priority, section }
+  return { title, area, due_date, priority, section, recurring }
 }
 
 export function formatDueDate(dateStr: string): { label: string; overdue: boolean } {

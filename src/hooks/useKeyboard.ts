@@ -13,11 +13,12 @@ interface Options {
   onFilter: () => void
   setSection: (s: Section | 'all') => void
   exportJSON: () => void
+  onCycleView?: () => void
 }
 
 export function useKeyboard({
   tasks, selectedId, setSelectedId,
-  onComplete, onDelete, onNewTask, onFilter, setSection, exportJSON,
+  onComplete, onDelete, onNewTask, onFilter, setSection, exportJSON, onCycleView,
 }: Options) {
   const handleKey = useCallback((e: KeyboardEvent) => {
     const tag = (e.target as HTMLElement).tagName
@@ -79,8 +80,13 @@ export function useKeyboard({
         if (e.ctrlKey || e.metaKey) { e.preventDefault(); exportJSON() }
         break
       }
+      case 'v': {
+        e.preventDefault()
+        onCycleView?.()
+        break
+      }
     }
-  }, [tasks, selectedId, setSelectedId, onComplete, onDelete, onNewTask, onFilter, setSection, exportJSON])
+  }, [tasks, selectedId, setSelectedId, onComplete, onDelete, onNewTask, onFilter, setSection, exportJSON, onCycleView])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKey)
