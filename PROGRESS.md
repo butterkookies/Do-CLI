@@ -162,6 +162,17 @@ Visual overhaul of the desktop widget with Apple-inspired Liquid Glass UI, inter
 - Exposed `onWindowFocus` / `onWindowBlur` callbacks in preload bridge
 - (Interactive opacity feature was explored but removed per user preference — widget stays permanently solid)
 
+#### 7. Toolbar Window Type (Taskbar Compatibility)
+- Changed Electron window `type` from default to `'toolbar'`
+- Windows no longer treats the widget as a "real" app window
+- Fixes conflict with **TranslucentTB** and similar taskbar transparency tools that switch to solid black when a normal window is detected
+- Combined with existing `skipTaskbar: true` for full stealth
+
+#### 8. Hot-Reload on Toggle
+- `Ctrl+Shift+D` now reloads `widget.html` fresh from disk every time the widget is shown
+- Eliminates stale-cache issues — any HTML/CSS/JS changes are picked up instantly
+- No more need to kill and restart the Electron process after editing `widget.html`
+
 ---
 
 ### 🐛 Issues Encountered & Fixed
@@ -171,6 +182,8 @@ Visual overhaul of the desktop widget with Apple-inspired Liquid Glass UI, inter
 | **Desktop bleeds through card** | `backdrop-filter: blur()` in Electron can't blur the actual OS desktop — only web content | Made card background 98-100% opaque; used CSS-only frost effects (gradients, glows, shimmer) instead |
 | **Heatmap cells invisible** | Level-0 color `#1e1e1e` was too close to card background | Changed to `#2a2a2a` and boosted all green levels |
 | **GPU cache errors on restart** | Previous Electron instance left stale lock on GPU shader cache folder | Harmless — can be cleared with `Remove-Item $env:APPDATA\do-widget\GPUCache` |
+| **TranslucentTB taskbar turns solid** | Electron default window type triggers "window present" detection in taskbar transparency tools | Set `type: 'toolbar'` — Windows treats it as a tool window, not a regular app |
+| **Hotkey shows stale widget** | Electron caches the loaded `widget.html` in memory | Added `win.loadFile('widget.html')` on every toggle-show |
 
 ---
 
@@ -179,5 +192,5 @@ Visual overhaul of the desktop widget with Apple-inspired Liquid Glass UI, inter
 | File | Change |
 |---|---|
 | `widget-desktop/widget.html` | Full Liquid Glass CSS overhaul, squircle clip-path, heatmap tooltips, frost effects |
-| `widget-desktop/main.js` | Added focus/blur IPC event emitters |
+| `widget-desktop/main.js` | Added focus/blur IPC, toolbar window type, hot-reload on toggle, session partition |
 | `widget-desktop/preload.js` | Exposed `onWindowFocus`/`onWindowBlur` IPC callbacks |

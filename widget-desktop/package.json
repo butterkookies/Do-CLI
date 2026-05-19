@@ -2,11 +2,39 @@
   "name": "do-widget",
   "version": "1.0.0",
   "description": "do. stats desktop widget",
+  "author": "Andrei",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --win --x64"
   },
-  "dependencies": {
-    "electron": "^30.0.0"
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.do.widget",
+    "productName": "do-widget",
+    "files": [
+      "main.js",
+      "preload.js",
+      "widget.html"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "runAfterFinish": false
+    }
   }
 }

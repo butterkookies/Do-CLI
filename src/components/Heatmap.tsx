@@ -16,19 +16,23 @@ interface Props {
 }
 
 const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
-const DAYS = ['s','m','t','w','t','f','s']
+const DAYS   = ['s','m','t','w','t','f','s']
+
+const HEAT_COLORS = [
+  'rgba(255,255,255,0.04)',
+  '#2d4d2d',
+  '#3d6e3d',
+  '#5a9e5a',
+  '#7dc87d',
+]
 
 export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
-  // Group into weeks (columns)
   const weeks = useMemo(() => {
     const w: Cell[][] = []
-    for (let i = 0; i < cells.length; i += 7) {
-      w.push(cells.slice(i, i + 7))
-    }
+    for (let i = 0; i < cells.length; i += 7) w.push(cells.slice(i, i + 7))
     return w
   }, [cells])
 
-  // Month labels: find first cell of each month
   const monthLabels = useMemo(() => {
     const labels: { label: string; col: number }[] = []
     let lastMonth = -1
@@ -36,36 +40,42 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
       const first = week.find(c => c)
       if (!first) return
       const m = new Date(first.date).getMonth()
-      if (m !== lastMonth) {
-        labels.push({ label: MONTHS[m], col: wi })
-        lastMonth = m
-      }
+      if (m !== lastMonth) { labels.push({ label: MONTHS[m], col: wi }); lastMonth = m }
     })
     return labels
   }, [weeks])
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-2">
-        <span style={{ color: 'var(--dim)', fontSize: '11px', letterSpacing: '0.08em' }}>
-          ACTIVITY
+    <div className="glass-panel" style={{ marginBottom: '20px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{
+          fontSize: '11px', fontWeight: 600,
+          color: 'rgba(255,255,255,0.72)',
+          letterSpacing: '0.07em', textTransform: 'uppercase',
+        }}>
+          Activity
         </span>
-        <div style={{ display: 'flex', gap: '20px', fontSize: '11px', color: 'var(--dim)' }}>
+        <div style={{ display: 'flex', gap: '16px', fontSize: '11px', fontWeight: 500 }}>
           <span>
-            <span style={{ color: 'var(--text)' }}>{streak.current}</span> day streak
+            <span style={{ color: 'var(--green)', fontWeight: 600 }}>{streak.current}</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}> day streak</span>
           </span>
           <span>
-            best <span style={{ color: 'var(--text)' }}>{streak.longest}</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>best </span>
+            <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{streak.longest}</span>
           </span>
           <span>
-            today <span style={{ color: 'var(--green)' }}>{todayDone}</span>
-            <span>/{todayCount + todayDone}</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>today </span>
+            <span style={{ color: 'var(--green)', fontWeight: 600 }}>{todayDone}</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>/{todayCount + todayDone}</span>
           </span>
         </div>
       </div>
 
       {/* Month labels */}
-      <div style={{ display: 'flex', marginBottom: '4px', paddingLeft: '20px' }}>
+      <div style={{ display: 'flex', marginBottom: '2px', paddingLeft: '20px' }}>
         {weeks.map((_, wi) => {
           const label = monthLabels.find(l => l.col === wi)
           return (
@@ -74,9 +84,10 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
               style={{
                 width: `${100 / weeks.length}%`,
                 fontSize: '10px',
-                color: 'var(--dim)',
+                color: 'rgba(255,255,255,0.3)',
                 whiteSpace: 'nowrap',
                 overflow: 'visible',
+                fontWeight: 500,
               }}
             >
               {label?.label ?? ''}
@@ -85,6 +96,7 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
         })}
       </div>
 
+      {/* Grid */}
       <div style={{ display: 'flex', gap: '2px' }}>
         {/* Day labels */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px' }}>
@@ -92,14 +104,10 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
             <div
               key={i}
               style={{
-                width: '10px',
-                height: '10px',
-                fontSize: '9px',
-                color: 'var(--dim)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
+                width: '10px', height: '10px',
+                fontSize: '9px', color: 'rgba(255,255,255,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                lineHeight: 1, fontWeight: 500,
               }}
             >
               {i % 2 === 1 ? d : ''}
@@ -107,23 +115,33 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
           ))}
         </div>
 
-        {/* Grid */}
+        {/* Cells */}
         {weeks.map((week, wi) => (
           <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
             {week.map((cell, di) => (
               <div
                 key={di}
-                className={`hm-${cell.level}`}
                 title={`${cell.date}: ${cell.count} completed`}
                 style={{
                   height: '10px',
                   borderRadius: '2px',
+                  background: HEAT_COLORS[cell.level],
                   cursor: 'default',
-                  transition: 'opacity 0.1s',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget
+                  el.style.transform = 'scale(1.4)'
+                  el.style.zIndex = '10'
+                  el.style.position = 'relative'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget
+                  el.style.transform = 'scale(1)'
+                  el.style.zIndex = '0'
                 }}
               />
             ))}
-            {/* Pad weeks shorter than 7 */}
             {Array.from({ length: 7 - week.length }).map((_, i) => (
               <div key={`pad-${i}`} style={{ height: '10px' }} />
             ))}
@@ -132,12 +150,19 @@ export function Heatmap({ cells, streak, todayCount, todayDone }: Props) {
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', justifyContent: 'flex-end' }}>
-        <span style={{ fontSize: '10px', color: 'var(--dim)' }}>less</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
+        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>less</span>
         {([0,1,2,3,4] as const).map(l => (
-          <div key={l} className={`hm-${l}`} style={{ width: '10px', height: '10px', borderRadius: '2px' }} />
+          <div
+            key={l}
+            style={{
+              width: '10px', height: '10px',
+              borderRadius: '2px',
+              background: HEAT_COLORS[l],
+            }}
+          />
         ))}
-        <span style={{ fontSize: '10px', color: 'var(--dim)' }}>more</span>
+        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>more</span>
       </div>
     </div>
   )

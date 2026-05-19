@@ -4,6 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>do. widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -17,11 +20,12 @@
     }
 
     body {
-      font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      font-size: 12px;
+      font-family: 'Inter', -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
       background: transparent !important;
-      color: #f0f0ea;
+      color: #f5f5f0;
       -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
       user-select: none;
       overflow: hidden
     }
@@ -112,8 +116,9 @@
     }
 
     #date {
-      font-size: 10px;
-      color: rgba(255, 255, 255, .35);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .7);
       margin-top: 3px
     }
 
@@ -127,8 +132,8 @@
     }
 
     #sync {
-      font-size: 10px;
-      color: rgba(255, 255, 255, .25);
+      font-size: 11px;
+      color: rgba(255, 255, 255, .55);
       text-align: right;
       margin-top: 3px;
       cursor: pointer;
@@ -195,9 +200,10 @@
     }
 
     .panel-label {
-      font-size: 10px;
-      color: rgba(255, 255, 255, .35);
-      letter-spacing: .08em;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .72);
+      letter-spacing: .07em;
       text-transform: uppercase
     }
 
@@ -208,9 +214,9 @@
     }
 
     .badge {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 6px;
       backdrop-filter: blur(4px)
     }
@@ -248,13 +254,14 @@
       background: none;
       border: none;
       outline: none;
-      color: #f0f0ea;
+      color: #f5f5f0;
       font-family: inherit;
-      font-size: 12px
+      font-size: 13px;
+      font-weight: 400
     }
 
     #add-input::placeholder {
-      color: rgba(255, 255, 255, .2)
+      color: rgba(255, 255, 255, .45)
     }
 
     #add-btn {
@@ -275,8 +282,9 @@
     }
 
     #syntax-hint {
-      font-size: 9px;
-      color: rgba(255, 255, 255, .15);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .45);
       display: flex;
       gap: 8px;
       padding: 0 2px
@@ -287,7 +295,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 9px;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .7);
       padding: 0 2px
     }
 
@@ -317,8 +327,9 @@
     .prog-row {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
-      color: rgba(255, 255, 255, .3)
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .72)
     }
 
     .prog-track {
@@ -388,12 +399,13 @@
 
     .task-item.completed .task-title {
       text-decoration: line-through;
-      color: rgba(255, 255, 255, .2)
+      color: rgba(255, 255, 255, .42)
     }
 
     .task-title {
-      font-size: 11px;
-      color: rgba(255, 255, 255, .6);
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .92);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -408,17 +420,19 @@
     }
 
     .task-area {
-      font-size: 8px;
-      color: rgba(255, 255, 255, .3);
-      padding: 1px 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .65);
+      padding: 2px 6px;
       border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .15);
       flex-shrink: 0
     }
 
     .task-section {
-      font-size: 8px;
-      color: rgba(255, 255, 255, .2);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .5);
       flex-shrink: 0
     }
 
@@ -439,12 +453,12 @@
       border-radius: 7px;
       cursor: pointer;
       font-family: inherit;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: .06em;
+      letter-spacing: .05em;
       text-transform: uppercase;
       background: transparent;
-      color: rgba(255, 255, 255, .25);
+      color: rgba(255, 255, 255, .55);
       transition: all .25s
     }
 
@@ -516,9 +530,10 @@
     }
 
     .chip-label {
-      font-size: 9px;
-      color: rgba(255, 255, 255, .3);
-      letter-spacing: .08em;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .68);
+      letter-spacing: .07em;
       text-transform: uppercase
     }
 
@@ -529,8 +544,9 @@
     }
 
     .chip-sub {
-      font-size: 9px;
-      color: rgba(255, 255, 255, .2)
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .58)
     }
 
     /* ── Heatmap ── */
@@ -597,8 +613,9 @@
     }
 
     #footer a {
-      font-size: 10px;
-      color: rgba(255, 255, 255, .15);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .45);
       text-decoration: none;
       transition: color .2s
     }
@@ -610,8 +627,9 @@
 
     #loading {
       text-align: center;
-      color: rgba(255, 255, 255, .25);
-      font-size: 11px;
+      color: rgba(255, 255, 255, .65);
+      font-size: 13px;
+      font-weight: 500;
       padding: 20px 0
     }
 
