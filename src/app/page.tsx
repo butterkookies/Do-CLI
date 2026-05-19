@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useRef, useCallback } from 'react'
 import { useTasks } from '@/hooks/useTasks'
 import { useKeyboard } from '@/hooks/useKeyboard'

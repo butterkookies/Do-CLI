@@ -5,3 +5,7 @@ node_modules/
 out/
 *.log
 .DS_Store
+
+# Electron build artifacts
+widget-desktop/dist/
+widget-desktop/node_modules/
